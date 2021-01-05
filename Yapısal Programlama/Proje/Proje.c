@@ -55,12 +55,51 @@ void ogr_ders_yaz();
 void derskodu_sinif();
 
 int main(){
+	int max_kredi,max_ders;
+	int secim=-1;
+	printf("Ogrencinin alabilecegi maksimum kredi sayisini giriniz:");
+	scanf("%d",&max_kredi);
+	printf("Ogrencinin alabilecegi maksimum ders sayisini giriniz:");
+	scanf("%d",&max_ders);
 	
+	printf("-----------------MENU------------\n");
+	printf("0:  Cikis\n");
+	printf("1:  Ders ekle\n");
+	printf("2:  Ders sil\n");
+	printf("3:  Ders guncelle\n");
+	printf("4:  Ogretim uyesi ekle\n");
+	printf("5:  Ogretim uyesi sil\n");
+	printf("6:  Ogretim uyesi bilgilerini guncelle\n");
+	printf("7:  Ogrenci ekle\n");
+	printf("8:  Ogrenci sil\n");
+	printf("9:  Ogrenci bilgilerini guncelle\n");
+	printf("10: Ogrenci icin ders sec\n");
+	printf("11: Ogretim uyesinin verdigi dersleri yazdir\n");
+	printf("12: Derse kayitli ogrencileri yazdir\n");
+	printf("13: Ogrencinin aldigi dersleri yazdir\n");
+	printf("14: DERSKODU_SINIFLISTESI.txt dosyasini yaz\n");
 	
-	
-	
-	
-	
+	while(secim!=0){
+		printf("Secim:");
+		scanf("%d",&secim);
+		
+		if(secim==0) printf("Bay bay.\n");
+		else if(secim==1) ders_ekle();
+		else if(secim==2) ders_sil();
+		else if(secim==3) ders_guncelle();
+		else if(secim==4) uye_ekle();
+		else if(secim==5) uye_sil();
+		else if(secim==6) uye_guncelle();
+		else if(secim==7) ogrenci_ekle();
+		else if(secim==8) ogrenci_sil();
+		else if(secim==9) ogrenci_guncelle(max_kredi,max_ders);
+		else if(secim==10) ders_sec(max_kredi,max_ders);
+		else if(secim==11) uye_ders_yaz();
+		else if(secim==12) ders_ogr_yaz();
+		else if(secim==13) ogr_ders_yaz();
+		else if(secim==14) derskodu_sinif();
+		else printf("Beklenmedik secim, lutfen bir daha deneyin.\n");
+	}
 	
 	return 0;
 }
@@ -257,7 +296,7 @@ void ders_guncelle(){
 		if (strcmp(secim,"0")==0){
 			char isim[50];
 			printf("Dersin yeni ismi:");
-			scanf("%[^\n]s",isim);
+			scanf("%s",isim);
 			
 			fp=fopen("Dersler.txt","r");
 			while(!feof(fp)){
@@ -531,11 +570,11 @@ void uye_ekle(){
 	
 	printf("----------------OGRETIM UYESI EKLE---------------\n");
 	printf("Ogretim uyesi adi:");
-	scanf("%[^\n]s",input.ad);
+	scanf("%s",input.ad);
 	printf("Ogretim uyesi soyadi:");
-	scanf("%[^\n]s",input.soyad);
+	scanf("%s",input.soyad);
 	printf("Ogretim uyesi unvani:");
-	scanf("%[^\n]s",input.unvan);
+	scanf("%s",input.unvan);
 	printf("Ogretim uyesi ID'si:");
 	scanf("%d",input.id);
 	
@@ -682,7 +721,7 @@ void uye_guncelle(){
 		if (strcmp(secim,"0")){
 			char unvan[20];
 			printf("Ogretim uyesinin yeni unvani:");
-			scanf("%[^\n]s",unvan);
+			scanf("%s",unvan);
 			
 			fp=fopen("Ogretim Uyeleri.txt","r");
 			while(!feof(fp)){
@@ -936,7 +975,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 		if(strcmp(secim,"0")==0){
 			char yeni_no[11];
 			printf("Ogrencinin yeni numarasi:");
-			scanf("%[^\n]s",yeni_no);
+			scanf("%s",yeni_no);
 			
 			fp=fopen("Ogrenciler.txt","r");
 			while(!feof(fp)){
