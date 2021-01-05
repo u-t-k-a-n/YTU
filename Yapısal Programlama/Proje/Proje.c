@@ -4,8 +4,6 @@
 
 
 //malloc larý yap
-//menü oluþtur
-//mainde max kredi,ders al
 
 typedef struct{
 	char ad[50];
@@ -515,7 +513,7 @@ void ders_guncelle(){
 			FILE *fp_o=fopen("Ogretim Uyeleri.txt","r");
 			
 			if (fp_o==NULL){
-				printf("Ogretim Uyeleri dosyasý acilamadi.\n");
+				printf("Ogretim Uyeleri dosyasi acilamadi.\n");
 				return;
 			}
 			
@@ -576,13 +574,13 @@ void uye_ekle(){
 	printf("Ogretim uyesi unvani:");
 	scanf("%s",input.unvan);
 	printf("Ogretim uyesi ID'si:");
-	scanf("%d",input.id);
+	scanf("%d",&input.id);
 	
 	fp=fopen("Ogretim Uyeleri.txt","a+");
 	while(!feof(fp)){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		if(input.id==uye.id){
-			printf("Ayni ID'li baska bir ogretim gorevlisi bulunmaktadýr.");
+			printf("Ayni ID'li baska bir ogretim gorevlisi bulunmaktadir.");
 			fclose(fp);
 			return;
 		}
@@ -855,7 +853,7 @@ void ogrenci_ekle(){
 		}
 	}
 	
-	fprintf(fp,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,0,0);
+	fprintf(fp,"%s %s %s %d %d\n",input.ad,input.soyad,input.no,0,0);
 	printf("Ogrenci kaydedildi.\n");
 	fclose(fp);
 }
@@ -1171,7 +1169,7 @@ void ders_sec(int max_kredi,int max_ders){
 	int ogr_kontrol=0;
 	
 	printf("---------------DERS SECME--------------\n");
-	printf("Ogrencinin numarsini giriniz:");
+	printf("Ogrencinin numarasini giriniz:");
 	scanf("%s",no);
 	
 	fp=fopen("Ogrenciler.txt","a+");
@@ -1270,7 +1268,7 @@ void ders_sec(int max_kredi,int max_ders){
 				fclose(fp);
 				fclose(fp_t);
 				printf("Ders secildi.\n");
-				printf("Ogrenciler.txt dosyasý guncellendi.\n");
+				printf("Ogrenciler.txt dosyasi guncellendi.\n");
 				
 			}
 			else{
