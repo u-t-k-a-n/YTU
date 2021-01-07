@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-
+//ogr_ders_yaz de kaldýk
+// satir=-1 feofla counter yap, for(i=0;i<satir;i++) fprintf yaz
 //malloc larý yap
 
 typedef struct{
@@ -106,6 +107,8 @@ void ders_ekle(){
 	
 	FILE *fp;
 	DERS ders,input;
+	int i;
+	int satir=-1;
 	
 	printf("---------DERS EKLE---------\n");
 	printf("Ders adi:");
@@ -136,6 +139,13 @@ void ders_ekle(){
 	
 	while (!feof(fp)){
 		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+		satir++;
+		
+	}
+	fclose(fp);
+	fp=fopen("Dersler.txt","a+");
+	for(i=0;i<satir;i++){
+		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 		if (strcmp(input.ad,ders.ad)==0 || strcmp(input.kod,ders.kod)==0){
 			printf("Ayni isimli veya kodlu ders bulunuyor.\n");
 			fclose(fp);
@@ -155,6 +165,7 @@ void ders_sil(){
 	int ders_kontrol=0; // 0 ise ders kayýtlarda bulunmuyor, 1 ise bulunuyor.
 	int kredi;
 	fp=fopen("Dersler.txt","a+");
+	int i,satir=-1;
 	
 	if(fp==NULL){
 		printf("Dosya acilamadi.\n");
@@ -165,7 +176,14 @@ void ders_sil(){
 	printf("Silmek istediginiz dersin kodunu giriniz:");
 	scanf("%s",kod);
 	
-	while ((!feof(fp)) && ders_kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Dersler.txt","a+");
+	
+	for (i=0;i<satir && ders_kontrol!=1;i++){
 		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 		
 		
@@ -184,7 +202,7 @@ void ders_sil(){
 		FILE *fp_t=fopen("tmp.txt","w");
 		fp=fopen("Dersler.txt","r");
 		
-		while (!feof(fp)){
+		for (i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			if (strcmp(kod,ders.kod)!=0){
 				fprintf(fp_t,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);	
@@ -195,8 +213,15 @@ void ders_sil(){
 		
 		fp=fopen("Dersler.txt","w");
 		fp_t=fopen("tmp.txt","r");
-		
+		satir=-1;
 		while(!feof(fp_t)){
+			fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir++;
+		}
+		fclose(fp_t);
+		fp_t=fopen("tmp.txt","r");
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 		}
@@ -204,16 +229,34 @@ void ders_sil(){
 		fclose(fp_t);
 		printf("Ders basariyla silindi.\n");
 		
+		satir=-1;
+		int satir2=-1;
+		int j;
+		
 		fp=fopen("OgrenciDersKayit.txt","a+");
 		fp_t=fopen("tmp.txt","w");
+		
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir++;
+		}
+		fclose(fp);
+		fp2=fopen("Ogrenciler.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+			satir2++;
+		}
+		fclose(fp2);
+		
+		fp=fopen("OgrenciDersKayit.txt","a+");
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			if (strcmp(o_der.kod,kod)==0){
 				fp2=fopen("Ogrenciler.txt","a+");
 				fp_t2=fopen("tmp2.txt","w");
 				strcpy(no,o_der.no);
 				
-				while (!feof(fp2)){
+				for (j=0;j<satir2;j++){
 					fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 					if (strcmp(ogr.no,no)==0){
 						ogr.ders_no-=1;
@@ -226,7 +269,7 @@ void ders_sil(){
 				
 				fp2=fopen("Ogrenciler.txt","w");
 				fp_t2=fopen("tmp2.txt","r");
-				while(!feof(fp_t2)){
+				for(j=0;j<satir2;j++){
 					fscanf(fp_t2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 					fprintf(fp2,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 				}
@@ -244,7 +287,7 @@ void ders_sil(){
 		
 		fp=fopen("OgrenciDersKayit.txt","w");
 		fp_t=fopen("tmp.txt","r");
-		while(!feof(fp_t)){
+		for(i=0;i<satir;i++){
 			fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			fprintf(fp,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 		}
@@ -265,14 +308,22 @@ void ders_guncelle(){
 	char kod[7];
 	DERS ders;
 	int ders_kontrol=0;
+	int i;
+	int satir=-1;
 	
 	printf("--------DERS GUNCELLE-----------\n");
 	printf("Guncellemek istediginiz dersin kodunu giriniz:");
 	scanf("%s",kod);
 	
 	fp=fopen("Dersler.txt","a+");
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Dersler.txt","a+");
 	
-	while ((!feof(fp)) && ders_kontrol!=1){
+	for(i=0;i<satir && ders_kontrol!=1;i++){
 		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 		if (strcmp(kod,ders.kod)==0) ders_kontrol=1;
 		
@@ -297,7 +348,7 @@ void ders_guncelle(){
 			scanf("%s",isim);
 			
 			fp=fopen("Dersler.txt","r");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(isim,ders.ad)==0){
 					printf("Ayni isimli ders bulunmaktadir.\n");
@@ -309,7 +360,7 @@ void ders_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Dersler.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(ders.kod,kod)==0){
 					strcpy(ders.ad,isim);
@@ -322,7 +373,7 @@ void ders_guncelle(){
 			fp=fopen("Dersler.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 				
@@ -339,7 +390,7 @@ void ders_guncelle(){
 			scanf("%s",yeni_kod);
 			
 			fp=fopen("Dersler.txt","r");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(yeni_kod,ders.kod)==0){
 					printf("Ayni kodlu ders bulunmaktadir.");
@@ -353,7 +404,7 @@ void ders_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Dersler.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(ders.kod,kod)==0){
 					strcpy(ders.kod,yeni_kod);
@@ -366,7 +417,7 @@ void ders_guncelle(){
 			fp=fopen("Dersler.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 				
@@ -376,7 +427,15 @@ void ders_guncelle(){
 			
 			fp=fopen("OgrenciDersKayit.txt","a+");
 			fp_t=fopen("tmp.txt","w");
+			satir=-1;
 			while(!feof(fp)){
+				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+				satir++;
+			}
+			fclose(fp);
+			fp=fopen("OgrenciDersKayit.txt","a+");
+			
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				if (strcmp(o_der.kod,kod)==0) strcpy(o_der.kod,yeni_kod);
 				fprintf(fp_t,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
@@ -386,7 +445,7 @@ void ders_guncelle(){
 			
 			fp=fopen("OgrenciDersKayit.txt","w");
 			fp_t=fopen("tmp.txt","r");
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				fprintf(fp,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			}
@@ -412,7 +471,7 @@ void ders_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Dersler.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++)){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(ders.kod,kod)==0){
 					kredi=ders.kredi;
@@ -427,7 +486,7 @@ void ders_guncelle(){
 			fp=fopen("Dersler.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 				
@@ -438,15 +497,31 @@ void ders_guncelle(){
 			
 			yeni_kredi-=kredi;
 			
+			int j;
+			int satir2=-1;
+			satir=-1;
 			fp=fopen("OgrenciDersKayit.txt","a+");
 			while(!feof(fp)){
+				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+				satir++;
+			}
+			fclose(fp);
+			fp2=fopen("Ogrenciler.txt","a+");
+			while(!feof(fp2)){
+				fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+				satir2++;
+			}
+			fclose(fp2);
+			
+			fp=fopen("OgrenciDersKayit.txt","a+");
+			while(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				if (strcmp(o_der.kod,kod)==0){
 					fp2=fopen("Ogrenciler.txt","a+");
 					fp_t=fopen("tmp.txt","w");
 					strcpy(no,o_der.no);
 					
-					while (!feof(fp2)){
+					while (j=0;j<satir;j++){
 						fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 						if (strcmp(ogr.no,no)==0){
 							ogr.kredi+=yeni_kredi;
@@ -458,7 +533,7 @@ void ders_guncelle(){
 					
 					fp2=fopen("Ogrenciler.txt","w");
 					fp_t=fopen("tmp.txt","r");
-					while(!feof(fp_t)){
+					while(j=0;j<satir2;j++){
 						fscanf(fp_t,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 						fprintf(fp2,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 					}
@@ -481,7 +556,7 @@ void ders_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Dersler.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(ders.kod,kod)==0){
 					ders.kontenjan=kontenjan;
@@ -494,7 +569,7 @@ void ders_guncelle(){
 			fp=fopen("Dersler.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 				
@@ -511,6 +586,7 @@ void ders_guncelle(){
 			printf("Dersi verecek olan ogretim uyesinin ID'si:");
 			scanf("%d",&id);
 			FILE *fp_o=fopen("Ogretim Uyeleri.txt","r");
+			int satir2=-1;
 			
 			if (fp_o==NULL){
 				printf("Ogretim Uyeleri dosyasi acilamadi.\n");
@@ -518,7 +594,14 @@ void ders_guncelle(){
 			}
 			
 			OGR_UYE uye;
+			
 			while(!feof(fp_o)){
+				fscanf(fp_o,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+				satir2++;
+			}
+			fclose(fp_o);
+			fp_o=fopen("Ogretim Uyeleri.txt","a+");
+			for(i=0;i<satir2;i++){
 				fscanf(fp_o,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				if(uye.id==id){
 					count++;
@@ -533,7 +616,7 @@ void ders_guncelle(){
 				FILE *fp_t=fopen("tmp.txt","w");
 				fp=fopen("Dersler.txt","r");
 				
-				while(!feof(fp)){
+				for(i=0;i<satir;i++){
 					fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 					if (strcmp(ders.kod,kod)==0){
 						ders.ogrt_id=id;
@@ -546,7 +629,7 @@ void ders_guncelle(){
 				fp=fopen("Dersler.txt","w");
 				fp_t=fopen("tmp.txt","r");
 				
-				while(!feof(fp_t)){
+				for(i=0;i<satir;i++){
 					fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 					fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 				}
@@ -565,6 +648,9 @@ void ders_guncelle(){
 void uye_ekle(){
 	OGR_UYE uye,input;
 	FILE *fp;
+	int i;
+	int satir=-1;
+	
 	
 	printf("----------------OGRETIM UYESI EKLE---------------\n");
 	printf("Ogretim uyesi adi:");
@@ -577,7 +663,15 @@ void uye_ekle(){
 	scanf("%d",&input.id);
 	
 	fp=fopen("Ogretim Uyeleri.txt","a+");
+	
 	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogretim Uyeleri.txt","a+");
+	
+	for(i=0;i<satir;i++){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		if(input.id==uye.id){
 			printf("Ayni ID'li baska bir ogretim gorevlisi bulunmaktadir.");
@@ -594,13 +688,23 @@ void uye_sil(){
 	int uye_kontrol=0; // 0 ise üye kayýtlý deðil,1 ise kayýtlý
 	FILE *fp;
 	OGR_UYE uye;
+	int i;
+	int satir=-1;
 	
 	printf("------------OGRETIM UYESI SILME--------------\n");
 	printf("Silmek istediginiz ogretim uyesinin ID'sini giriniz:");
 	scanf("%d",&id);
 	
 	fp=fopen("Ogretim Uyeleri.txt","a+");
-	while((!feof(fp)) && uye_kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+		satir++;
+	}
+	fclose(fp);
+	
+	
+	fp=fopen("Ogretim Uyeleri.txt","a+");
+	for (i=0;i<satir && uye_kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		
 		if (id==uye.id){
@@ -608,6 +712,7 @@ void uye_sil(){
 			fclose(fp);
 		}	
 	}
+	
 	if (uye_kontrol==1){
 		fp=fopen("Dersler.txt","a+");
 		FILE *fp_t=fopen("tmp.txt","w");
@@ -615,15 +720,24 @@ void uye_sil(){
 		DERS ders;
 		int yeni_id;
 		int kontrol;
+		int j;
+		int satir2;
 		
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir2++;
+		}
+		fclose(fp);
+		fp=fopen("Dersler.txt","a+");
+		
+		for(i=0;i<satir2;i++){
 			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			if (id==ders.ogrt_id){
 				printf("%s kodlu dersi yeni verecek olan ogretim uyesinin ID'sini giriniz:",ders.kod);
 				scanf("%d",&yeni_id);
 				fp2=fopen("Ogretim Uyeleri.txt","r");
 				kontrol=0;
-				while((!feof(fp2)) && kontrol!=1){
+				for(j=0;j<satir && kontrol!=1;j++){
 					fscanf(fp2,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 					if (yeni_id==uye.id){
 						kontrol=1;
@@ -646,7 +760,7 @@ void uye_sil(){
 		
 		fp=fopen("Dersler.txt","w");
 		fp_t=fopen("tmp.txt","r");
-		while(!feof(fp_t)){
+		for(i=0;i<satir2;i++){
 			fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 		}
@@ -659,7 +773,7 @@ void uye_sil(){
 		fp=fopen("Ogretim Uyeleri.txt","r");
 		
 		
-		while (!feof(fp)){
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 			if (id!=uye.id){
 				fprintf(fp_t,"%s %s %s %d\n",uye.ad,uye.soyad,uye.unvan,uye.id);	
@@ -671,7 +785,15 @@ void uye_sil(){
 		fp=fopen("Dersler.txt","w");
 		fp_t=fopen("tmp.txt","r");
 		
+		satir=-1;
 		while(!feof(fp_t)){
+			fscanf(fp_t,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+			satir++;
+		}
+		fclose(fp_t);
+		fp_t=fopen("tmp.txt","r");
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp_t,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 			fprintf(fp,"%s %s %s %d\n",uye.ad,uye.soyad,uye.unvan,uye.id);
 		}
@@ -689,15 +811,23 @@ void uye_guncelle(){
 	int uye_kontrol=0;
 	FILE *fp;
 	OGR_UYE uye;
+	int i;
+	int satir=-1;
 	
 	
 	printf("-----------------OGRETIM UYESI GUNCELLE-------------------\n");
 	printf("Bilgilerini guncellemek istediginiz ogretim uyesinin ID'sini yaziniz:");
 	scanf("%d",&id);
 	
+	fp=fopen("Ogretim Uyeleri.txt","a+");
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+		satir++;	
+	}
+	fclose(fp);
 	
 	fp=fopen("Ogretim Uyeleri.txt","a+");
-	while((!feof(fp)) && uye_kontrol!=1){
+	for(i=0;i<satir && uye_kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		if (id==uye.id) uye_kontrol=1;
 	}
@@ -722,7 +852,7 @@ void uye_guncelle(){
 			scanf("%s",unvan);
 			
 			fp=fopen("Ogretim Uyeleri.txt","r");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				if (strcmp(unvan,uye.unvan)==0){
 					printf("Ayni unvani girdiniz.\n");
@@ -734,7 +864,7 @@ void uye_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Ogretim Uyeleri.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				if (id==uye.id){
 					strcpy(uye.unvan,unvan);
@@ -747,7 +877,7 @@ void uye_guncelle(){
 			fp=fopen("Ogretim Uyeleri.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				fprintf(fp,"%s %s %s %d\n",uye.ad,uye.soyad,uye.unvan,uye.id);
 				
@@ -763,7 +893,7 @@ void uye_guncelle(){
 			scanf("%d",&yeni_id);
 			
 			fp=fopen("Ogretim Uyeleri.txt","r");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				if (yeni_id==uye.id){
 					printf("Boyle bir ID bulunuyor.\n");
@@ -775,7 +905,7 @@ void uye_guncelle(){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Ogretim Uyeleri.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				if (id==uye.id){
 					uye.id=yeni_id;
@@ -788,7 +918,7 @@ void uye_guncelle(){
 			fp=fopen("Ogretim Uyeleri.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 				fprintf(fp,"%s %s %s %d\n",uye.ad,uye.soyad,uye.unvan,uye.id);
 				
@@ -797,9 +927,17 @@ void uye_guncelle(){
 			fclose(fp_t);
 			printf("ID degistirildi.\n");
 			
+			satir=-1;
+			fp=fopen("Dersler.txt","a+");
+			while(!feof(fp)){
+				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+				satir++;
+			}
+			fclose(fp);
+			
 			fp=fopen("Dersler.txt","a+");
 			fp_t=fopen("tmp.txt","w");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if(ders.ogrt_id==id){
 					ders.ogrt_id=yeni_id;
@@ -811,7 +949,7 @@ void uye_guncelle(){
 			
 			fp=fopen("Dersler.txt","w");
 			fp_t=fopen("tmp.txt","r");
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				fprintf(fp,"%s %s %d %d %d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan,ders.ogrt_id);
 			}
@@ -830,6 +968,8 @@ void uye_guncelle(){
 void ogrenci_ekle(){
 	FILE *fp;
 	OGRENCI ogr,input;
+	int i;
+	int satir=-1;
 	
 	printf("------------OGRENCI EKLE-----------------\n");
 	printf("Ogrenci adi:");
@@ -844,7 +984,14 @@ void ogrenci_ekle(){
 		return;
 	}
 	
-	while (!feof(fp)){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogrenciler.txt","a+");
+	
+	for (i=0;i<satir;i++){
 		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 		if (strcmp(input.no,ogr.no)==0){
 			printf("Ayni numarali ogrenci bulunuyor.\n");
@@ -863,17 +1010,26 @@ void ogrenci_sil(){
 	char no[11];
 	int ogr_kontrol=0; // 0 ise öðrenci kayýtlarda bulunmuyor, 1 ise bulunuyor.
 	fp=fopen("Ogrenciler.txt","a+");
+	int i;
+	int satir=-1;
 	
 	if(fp==NULL){
 		printf("Dosya acilamadi.\n");
 		return;
 	}
 	
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogrenciler.txt","a+");
+	
 	printf("---------OGRENCI SIL----------\n");
 	printf("Silmek istediginiz ogrencinin numarasini giriniz:");
 	scanf("%s",no);
 	
-	while ((!feof(fp)) && ogr_kontrol!=1){
+	for (i=0;i<satir && ogr_kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 		
 		if (strcmp(no,ogr.no)==0){
@@ -887,21 +1043,27 @@ void ogrenci_sil(){
 		fp=fopen("Ogrenciler.txt","r");
 		OGR_DERS o_der;
 		
-		while (!feof(fp)){
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 			if (strcmp(no,ogr.no)!=0){
 				fprintf(fp_t,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 			}
-			
-
 		}
 		fclose(fp);
 		fclose(fp_t);
+		satir=-1;
 		
 		fp=fopen("Ogrenciler.txt","w");
 		fp_t=fopen("tmp.txt","r");
 		
 		while(!feof(fp_t)){
+			fscanf(fp_t,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+			satir++;
+		}
+		fclose(fp_t);
+		fp_t=fopen("tmp.txt","r");
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp_t,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 			fprintf(fp,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 		}
@@ -912,7 +1074,16 @@ void ogrenci_sil(){
 		fp=fopen("OgrenciDerskayit.txt","a+");
 		fp_t=fopen("tmp.txt","w");
 		
+		satir=-1;
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir++;
+		}
+		fclose(fp);
+		fp=fopen("OgrenciDersKayit.txt","a+");
+		
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			if (strcmp(o_der.no,no)!=0){
 				fprintf(fp_t,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
@@ -921,9 +1092,17 @@ void ogrenci_sil(){
 		fclose(fp);
 		fclose(fp_t);
 		
-		fp=fopen("OgrenciDersKayit.txt","w");
+		satir=-1;
 		fp_t=fopen("tmp.txt","r");
 		while(!feof(fp_t)){
+			fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir++;
+		}
+		fclose(fp_t);
+		
+		fp=fopen("OgrenciDersKayit.txt","w");
+		fp_t=fopen("tmp.txt","r");
+		for(i=0;i<satir;i++){
 			fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			fprintf(fp,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 		}
@@ -944,14 +1123,24 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 	OGR_DERS o_der;
 	DERS ders;
 	int ogr_kontrol=0;
+	int i;
+	int satir=-1;
 	
 	printf("--------OGRENCI GUNCELLE-----------\n");
 	printf("Guncellemek istediginiz ogrencinin numarasini giriniz:");
 	scanf("%s",no);
 	
 	fp=fopen("Ogrenciler.txt","a+");
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+		satir++;
+	}
+	fclose(fp);
 	
-	while ((!feof(fp)) && ogr_kontrol!=1){
+	
+	fp=fopen("Ogrenciler.txt","a+");
+	
+	for (i=0;i<satir && ogr_kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 		if (strcmp(no,ogr.no)==0) ogr_kontrol=1;
 		
@@ -976,7 +1165,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 			scanf("%s",yeni_no);
 			
 			fp=fopen("Ogrenciler.txt","r");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 				if (strcmp(yeni_no,ogr.no)==0){
 					printf("Ayni numarali ogrenci bulunmaktadir.\n");
@@ -988,7 +1177,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 			FILE *fp_t=fopen("tmp.txt","w");
 			fp=fopen("Ogrenciler.txt","r");
 			
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 				if (strcmp(ogr.no,no)==0){
 					strcpy(ogr.no,yeni_no);
@@ -1001,7 +1190,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 			fp=fopen("Ogrenciler.txt","w");
 			fp_t=fopen("tmp.txt","r");
 			
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 				fprintf(fp,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 				
@@ -1010,9 +1199,17 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 			fclose(fp_t);
 			printf("Ogrencinin numarasi degistirildi.\n");
 			
+			satir=-1;
+			fp=fopen("OgrenciDersKayit.txt","a+");
+			while(!feof(fp)){
+				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+				satir++;
+			}
+			fclose(fp);
+			
 			fp=fopen("OgrenciDersKayit.txt","a+");
 			fp_t=fopen("tmp.txt","w");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				if (strcmp(no,o_der.no)==0){
 					strcpy(o_der.no,yeni_no);
@@ -1024,7 +1221,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 			
 			fp=fopen("OgrenciDersKayit.txt","w");
 			fp_t=fopen("tmp.txt","r");
-			while(!feof(fp_t)){
+			for(i=0;i<satir;i++){
 				fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				fprintf(fp,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			}
@@ -1035,12 +1232,22 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 		else if (strcmp(secim,"1")==0){
 			char kod[7];
 			int ders_kontrol=0;
+			int j;
+			int satir2=-1;satir3=-1;
 			
 			printf("Ogrencinin aldigi dersin kodunu giriniz:");
 			scanf("%s",kod);
 			fp=fopen("OgrenciDersKayit.txt","a+");
 			
-			while((!feof(fp)) && ders_kontrol!=1){
+			while(!feof(fp)){
+				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+				satir2++;
+			}
+			fclose(fp);
+			fp=fopen("OgrenciDersKayit.txt","a+");
+			
+			
+			for(i=0;i<satir2 && ders_kontrol!=1,i++){
 				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				if (strcmp(kod,o_der.kod)==0 && strcmp(no,o_der.no)==0){
 					ders_kontrol=1;
@@ -1056,18 +1263,24 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 				FILE *fp_t;
 				FILE *fp2,*fp_t2;
 				int kontrol,kredi;
-				fp=fopen("OgrenciDersKayit.txt","a+");
+				fp=fopen("Dersler.txt","a+");
 				fp_t=fopen("tmp.txt","w");
 				
-				
 				while(!feof(fp)){
+					fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+					satir3++;
+				}
+				fclose(fp);
+				fp=fopen("OgrenciDersKayit.txt","a+");
+				
+				for(i=0;i<satir2;i++){
 					fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 					if (strcmp(kod,o_der.kod)==0 && strcmp(no,o_der.no)==0){
 						
 						kontrol=0;
 						
 						fp2=fopen("Dersler.txt","r");
-						while(!feof(fp2) && kontrol!=1){
+						for(j=0;j<satir3 && kontrol!=1;j++){
 							fscanf(fp2,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 							if (strcmp(ders.kod,kod)==0){
 								kredi=ders.kredi;
@@ -1080,7 +1293,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 						if (o_der.kayit==0){
 							fp2=fopen("Ogrenciler.txt","r");
 							fp_t2=fopen("tmp2.txt","w");
-							while(!feof(fp2)){
+							for(j=0;j<satir;j++){
 								fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 								if (strcmp(no,ogr.no)==0){
 									if ((ogr.kredi+kredi)>max_kredi || (ogr.ders_no+1)>max_ders){
@@ -1100,7 +1313,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 							
 							fp2=fopen("Ogrenciler.txt","w");
 							fp_t2=fopen("tmp2.txt","r");
-							while(!feof(fp_t2)){
+							for(j=0;j<satir;j++){
 								fscanf(fp_t2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 								fprintf(fp2,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 							}	
@@ -1116,7 +1329,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 							fp2=fopen("Ogrenciler.txt","r");
 							fp_t2=fopen("tmp2.txt","w");
 							
-							while(!feof(fp2)){
+							for(j=0;j<satir;j++){
 								fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 								if (strcmp(no,ogr.no)==0){
 									ogr.kredi-=kredi;
@@ -1129,7 +1342,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 							
 							fp2=fopen("Ogrenciler.txt","w");
 							fp_t2=fopen("tmp2.txt","r");
-							while(!feof(fp_t2)){
+							for(j=0;j<satir;j++){
 								fscanf(fp_t2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 								fprintf(fp2,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 							}	
@@ -1148,7 +1361,7 @@ void ogrenci_guncelle(int max_kredi,int max_ders){
 				
 				fp=fopen("OgrenciDersKayit.txt","w");
 				fp_t=fopen("tmp.txt","r");
-				while(!feof(fp_t)){
+				for(i=0;i<satir2;i++){
 					fscanf(fp_t,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 					fprintf(fp,"%s %s %d %d %s %d %d\n",o_der.no,o_der.kod,o_der.ID,o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				}
@@ -1167,13 +1380,22 @@ void ders_sec(int max_kredi,int max_ders){
 	FILE *fp;
 	OGRENCI ogr;
 	int ogr_kontrol=0;
+	int i;
+	int satir=-1;
 	
 	printf("---------------DERS SECME--------------\n");
 	printf("Ogrencinin numarasini giriniz:");
 	scanf("%s",no);
 	
 	fp=fopen("Ogrenciler.txt","a+");
-	while ((!feof(fp)) && ogr_kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogrenciler.txt","a+");
+	
+	for(i=0;i<satir && ogr_kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 		if (strcmp(no,ogr.no)==0) ogr_kontrol=1;
 		
@@ -1188,12 +1410,19 @@ void ders_sec(int max_kredi,int max_ders){
 		char kod[7];
 		DERS ders;
 		int ders_kontrol=0;
+		int satir2=-1,satir3=-1;
 		printf("Secmek istediginiz dersin kodunu giriniz:\n");
 		scanf("%s",kod);
 		
 		fp=fopen("Dersler.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir2++;
+		}
+		fclose(fp);
+		fp=fopen("Dersler.txt","a+");
 		
-		while((!feof(fp)) && ders_kontrol!=1){
+		for(i=0;i<satir2 && ders_kontrol!=1;i++){
 			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			if (strcmp(kod,ders.kod)==0) ders_kontrol=1;
 		}
@@ -1203,11 +1432,11 @@ void ders_sec(int max_kredi,int max_ders){
 			return;
 		}
 		else{
-			int ders_kredi,ders_kont,ogr_kredi,ogr_ders,current_id,kon_counter=0;
+			int ders_kredi,ders_kont,ogr_kredi,ogr_ders,kon_counter=0;
 			OGR_DERS o_der;
 			
 			fp=fopen("Dersler.txt","a+");
-			while(!feof(fp)){
+			for(i=0;i<satir2;i++){
 				fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 				if (strcmp(ders.kod,kod)==0){
 					ders_kredi=ders.kredi;
@@ -1217,7 +1446,7 @@ void ders_sec(int max_kredi,int max_ders){
 			fclose(fp);
 			
 			fp=fopen("Ogrenciler.txt","a+");
-			while(!feof(fp)){
+			for(i=0;i<satir;i++){
 				fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 				if (strcmp(ogr.no,no)==0){
 					ogr_kredi=ogr.kredi;
@@ -1229,6 +1458,13 @@ void ders_sec(int max_kredi,int max_ders){
 			fp=fopen("OgrenciDersKayit.txt","a+");
 			while(!feof(fp)){
 				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+				satir3++;
+				
+			}
+			fclose(fp);
+			fp=fopen("OgrenciDersKayit.txt","a+");
+			for(i=0;i<satir3;i++){
+				fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 				if (strcmp(kod,o_der.kod)==0 && o_der.kayit==1) kon_counter++;
 				}
 			fclose(fp);
@@ -1238,16 +1474,13 @@ void ders_sec(int max_kredi,int max_ders){
 				FILE *fp_t;
 				
 				fp=fopen("OgrenciDersKayit.txt","a+");
-				while(!feof(fp)){
-					fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
-					current_id=o_der.ID;
-				}
-				fprintf(fp,"%s %s %d %d %s %d %d\n",no,kod,current_id+1,1,__DATE__);
+				
+				fprintf(fp,"%s %s %d %d %s %d %d\n",no,kod,satir3+1,1,__DATE__);
 				fclose(fp);
 				
 				fp=fopen("Ogrenciler.txt","a+");
 				fp_t=fopen("tmp.txt","w");
-				while(!feof(fp)){
+				for(i=0;i<satir;i++){
 					fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 					if (strcmp(no,ogr.no)==0){
 						ogr.kredi+=ders_kredi;
@@ -1261,7 +1494,7 @@ void ders_sec(int max_kredi,int max_ders){
 				fp=fopen("Ogrenciler.txt","w");
 				fp_t=fopen("tmp.txt","r");
 				
-				while(!feof(fp_t)){
+				for(i=0;i<satir;i++){
 					fscanf(fp_t,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 					fprintf(fp,"%s %s %s %d %d\n",ogr.ad,ogr.soyad,ogr.no,ogr.kredi,ogr.ders_no);
 				}
@@ -1284,15 +1517,26 @@ void uye_ders_yaz(){
 	OGR_UYE uye;
 	int id;
 	int kontrol=0;
+	int i;
+	int satir=-1;
 	
 	printf("Ogretim uyesinin ID'sini giriniz:");
 	scanf("%d",&id);
 	
 	fp=fopen("Ogretim Uyeleri.txt","a+");
-	while((!feof(fp)) && kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);	
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogretim Uyeleri.txt","a+");
+	
+	
+	for(i=0;i<satir && kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		if (id==uye.id) {
-		kontrol=1;}
+			kontrol=1;
+		}
 	}
 	fclose(fp);
 	if (kontrol==0){
@@ -1303,7 +1547,16 @@ void uye_ders_yaz(){
 		DERS ders;
 		printf("-------------OGRETIM UYESININ VERDIGI DERSLER------------\n");
 		fp=fopen("Dersler.txt","a+");
+		
+		satir=-1;
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir++;
+		}
+		fclose(fp);
+		fp=fopen("Dersler.txt","a+");
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			if(id==ders.ogrt_id){
 				printf("Ders Adi:%s  Ders Kodu:%s   Ders Kredisi:%d     Ders Kontenjani:%d\n",ders.ad,ders.kod,ders.kredi,ders.kontenjan);
@@ -1318,12 +1571,22 @@ void ders_ogr_yaz(){
 	DERS ders;
 	char kod[7];
 	int kontrol=0;
+	int i,j;
+	int satir=-1;
 	
 	printf("Ders kodunu giriniz:");
 	scanf("%s",kod);
 	
 	fp=fopen("Dersler.txt","a+");
-	while((!feof(fp)) && kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Dersler.txt","a+");
+	
+	
+	for(i=0;i<satir && kontrol!=1;i++){
 		fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 		if (strcmp(kod,ders.kod)==0) kontrol=1;
 	}
@@ -1336,14 +1599,28 @@ void ders_ogr_yaz(){
 		FILE *fp2;
 		OGR_DERS o_der;
 		OGRENCI ogr;
+		int satir2=-1;
 		fp=fopen("OgrenciDersKayit.txt","a+");
 		printf("---------------DERSI ALAN OGRENCÝLER---------------\n");
 		
+		satir=-1;
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir++;
+		}
+		fclose(fp);
+		
+		fp2=fopen("Ogrenciler.txt","a+");
+		while(!feof(fp2)){
+			fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+			satir2++;
+		}
+		
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			if (strcmp(kod,o_der.kod)==0){
 				fp2=fopen("Ogrenciler.txt","a+");
-				while(!feof(fp2)){
+				for(j=0;j<satir2;j++){
 					fscanf(fp2,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 					if(strcmp(o_der.no,ogr.no)==0 && o_der.kayit==1){
 						printf("Ogrenci Adi:%s   Ogrenci Soyadi:%s    Ogrenci No:%s      Ogrencinin Aldigi Kredi Sayisi:%d    Ogrencinin Aldigi Ders Sayisi:%d\n",
@@ -1363,9 +1640,18 @@ void ogr_ders_yaz(){
 	OGRENCI ogr;
 	FILE *fp;
 	int kontrol=0;
+	int i,j;
+	int satir=-1,satir2=-1;
 	
 	fp=fopen("Ogrenciler.txt","a+");
-	while((!feof(fp)) && kontrol!=1){
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogrenciler.txt","a+");
+	
+	for(i=0;i<satir && kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 		if (strcmp(ogr.no,no)==0) kontrol=1;
 	}
@@ -1375,17 +1661,35 @@ void ogr_ders_yaz(){
 		printf("Boyle bir ogrenci bulunmuyor.\n");
 		return;
 	}
+	
+	
 	else{
 		OGR_DERS o_der;
 		DERS ders;
 		FILE *fp2;
+		
+		satir=-1;
+		fp=fopen("OgrenciDersKayit.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir++;
+		}
+		fclose(fp);
+	
+		fp=fopen("Dersler.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir2++;
+		}
+		fclose(fp);
+	
 		fp=fopen("OgrenciDersKayit.txt","a+");
 		printf("---------OGRENCININ ALDIGI DERSLER--------------\n");
-		while (!feof(fp)){
+		for (i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 			if (strcmp(o_der.no,no)==0 && o_der.kayit==1){
 				fp2=fopen("Dersler.txt","a+");
-				while(!feof(fp2)){
+				for(j=0;j<satir2;j++){
 					fscanf(fp2,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 					if (strcmp(ders.kod,o_der.kod)==0){
 						printf("Ders Adi:%s    Ders Kodu:%s        Ders Kredisi:%d          Ders Kontenjani:%d        Dersi Veren Ogretim Uyesinin ID'si:%d\n",
@@ -1406,11 +1710,21 @@ void derskodu_sinif(){
 	FILE *fp;
 	OGR_UYE uye;
 	int kontrol=0;
+	int i,j,k;
+	int satir=-1,satir2=-1,satir3=-1;
 	
 	printf("Ogretim uyesinin ID'sini giriniz:");
 	scanf("%d",&id);
 	fp=fopen("Ogretim Uyeleri.txt","a+");
-	while((!feof(fp)) && kontrol!=1){
+	
+	while(!feof(fp)){
+		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
+		satir++;
+	}
+	fclose(fp);
+	fp=fopen("Ogretim Uyeleri.txt","a+");
+	
+	for(i=0;i<satir && kontrol!=1;i++){
 		fscanf(fp,"%s %s %s %d",uye.ad,uye.soyad,uye.unvan,&uye.id);
 		if (id==uye.id) kontrol=1;
 	}
@@ -1420,6 +1734,9 @@ void derskodu_sinif(){
 		printf("Boyle bir ogretim uyesi bulunmamaktadir.\n");
 		return;
 	}
+
+
+	
 	
 	else{
 		DERS ders;
@@ -1427,19 +1744,42 @@ void derskodu_sinif(){
 		OGR_DERS o_der;
 		OGRENCI ogr;
 		char dosya[24];
+		
+		satir=-1;
 		fp=fopen("Dersler.txt","a+");
 		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
+			satir++;
+		}
+		fclose(fp);
+	
+		fp=fopen("OgrenciDersKayit.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
+			satir2++;
+		}
+		fclose(fp);
+	
+		fp=fopen("Ogrenciler.txt","a+");
+		while(!feof(fp)){
+			fscanf(fp,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
+			satir3++;
+		}
+		fclose(fp);
+		
+		fp=fopen("Dersler.txt","a+");
+		for(i=0;i<satir;i++){
 			fscanf(fp,"%s %s %d %d %d",ders.ad,ders.kod,&ders.kredi,&ders.kontenjan,&ders.ogrt_id);
 			if(id==ders.ogrt_id){
 				strcpy(dosya,ders.kod);
 				strcat(dosya,"_SINIFLISTESI.txt");
 				fp4=fopen(dosya,"w");
 				fp2=fopen("OgrenciDersKayit.txt","a+");
-				while(!feof(fp2)){
+				for(j=0;j<satir2;j++){
 					fscanf(fp2,"%s %s %d %d %s %d %d",o_der.no,o_der.kod,&o_der.ID,&o_der.kayit,o_der.ay,o_der.gun,o_der.yil);
 					if(strcmp(ders.kod,o_der.kod)==0 && o_der.kayit==1){
 						fp3=fopen("Ogrenciler.txt","a+");
-						while(!feof(fp3)){
+						for(k=0;k<satir3;k++){
 							fscanf(fp3,"%s %s %s %d %d",ogr.ad,ogr.soyad,ogr.no,&ogr.kredi,&ogr.ders_no);
 							if (strcmp(o_der.no,ogr.no)==0){
 								fprintf(fp4,"%s %s %s\n",ogr.ad,ogr.soyad,ogr.no);
