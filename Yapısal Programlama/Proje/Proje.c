@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//ders_ogr_yaz de kaldık
-//malloc ları yap
 
 typedef struct{
 	char ad[50];
@@ -34,7 +32,7 @@ typedef struct{
 	char ay[3];
 	int gun,yil;
 	int ID;
-	int kayit; // 1 ise kayıtlı,0 ise bıraktı
+	int kayit; // 1 ise kayÃ½tlÃ½,0 ise bÃ½raktÃ½
 }OGR_DERS;
 
 void ders_ekle();
@@ -172,7 +170,7 @@ void ders_sil(){
 	FILE *fp;
 	DERS *ders=(DERS*)malloc(sizeof(DERS));
 	char *kod=(char*)malloc(7*sizeof(char));
-	int ders_kontrol=0; // 0 ise ders kayıtlarda bulunmuyor, 1 ise bulunuyor.
+	int ders_kontrol=0; // 0 ise ders kayÃ½tlarda bulunmuyor, 1 ise bulunuyor.
 	int kredi;
 	fp=fopen("Dersler.txt","a+");
 	int i,satir=-1;
@@ -736,7 +734,7 @@ void uye_ekle(){
 }
 void uye_sil(){
 	int id;
-	int uye_kontrol=0; // 0 ise üye kayıtlı değil,1 ise kayıtlı
+	int uye_kontrol=0; // 0 ise Ã¼ye kayÃ½tlÃ½ deÃ°il,1 ise kayÃ½tlÃ½
 	FILE *fp;
 	OGR_UYE *uye=(OGR_UYE*)malloc(sizeof(OGR_UYE));
 	int i;
@@ -1080,7 +1078,7 @@ void ogrenci_sil(){
 	FILE *fp;
 	OGRENCI *ogr=(OGRENCI*)malloc(sizeof(OGRENCI));
 	char *no=(char*)malloc(11*sizeof(char));
-	int ogr_kontrol=0; // 0 ise öğrenci kayıtlarda bulunmuyor, 1 ise bulunuyor.
+	int ogr_kontrol=0; // 0 ise Ã¶Ã°renci kayÃ½tlarda bulunmuyor, 1 ise bulunuyor.
 	fp=fopen("Ogrenciler.txt","a+");
 	int i;
 	int satir=-1;
@@ -1723,7 +1721,7 @@ void ders_ogr_yaz(){
 		OGRENCI *ogr=(OGRENCI*)malloc(sizeof(OGRENCI));
 		int satir2=-1;
 		fp=fopen("OgrenciDersKayit.txt","a+");
-		printf("---------------DERSI ALAN OGRENCİLER---------------\n");
+		printf("---------------DERSI ALAN OGRENCÃLER---------------\n");
 		
 		satir=-1;
 		while(!feof(fp)){
