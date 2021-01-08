@@ -1592,7 +1592,7 @@ void ders_sec(int max_kredi,int max_ders){
 				
 				fp=fopen("OgrenciDersKayit.txt","a+");
 				
-				fprintf(fp,"%s %s %d %d %s %d %d\n",no,kod,satir3+1,1,__DATE__);
+				fprintf(fp,"%s %s %d %d %s\n",no,kod,satir3+1,1,__DATE__);
 				fclose(fp);
 				
 				fp=fopen("Ogrenciler.txt","a+");
