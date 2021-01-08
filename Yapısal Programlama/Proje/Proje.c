@@ -3,6 +3,7 @@
 #include <string.h>
 
 
+
 typedef struct{
 	char ad[50];
 	char kod[7];
@@ -32,7 +33,7 @@ typedef struct{
 	char ay[3];
 	int gun,yil;
 	int ID;
-	int kayit; // 1 ise kayÃ½tlÃ½,0 ise bÃ½raktÃ½
+	int kayit; // 1 ise kayıtlı,0 ise bıraktı
 }OGR_DERS;
 
 void ders_ekle();
@@ -158,6 +159,8 @@ void ders_ekle(){
 			return;
 		}
 	}
+	fclose(fp);
+	fp=fopen("Dersler.txt","a+");
 	
 	fprintf(fp,"%s %s %d %d %d\n",input[0].ad,input[0].kod,input[0].kredi,input[0].kontenjan,input[0].ogrt_id);
 	printf("Ders kaydedildi.\n");
@@ -170,7 +173,7 @@ void ders_sil(){
 	FILE *fp;
 	DERS *ders=(DERS*)malloc(sizeof(DERS));
 	char *kod=(char*)malloc(7*sizeof(char));
-	int ders_kontrol=0; // 0 ise ders kayÃ½tlarda bulunmuyor, 1 ise bulunuyor.
+	int ders_kontrol=0; // 0 ise ders kayıtlarda bulunmuyor, 1 ise bulunuyor.
 	int kredi;
 	fp=fopen("Dersler.txt","a+");
 	int i,satir=-1;
@@ -726,6 +729,8 @@ void uye_ekle(){
 			return;
 		}
 	}
+	fclose(fp);
+	fp=fopen("Ogretim Uyeleri.txt","a+");
 	fprintf(fp,"%s %s %s %d\n",input[0].ad,input[0].soyad,input[0].unvan,input[0].id);
 	free(uye);
 	free(input);
@@ -734,7 +739,7 @@ void uye_ekle(){
 }
 void uye_sil(){
 	int id;
-	int uye_kontrol=0; // 0 ise Ã¼ye kayÃ½tlÃ½ deÃ°il,1 ise kayÃ½tlÃ½
+	int uye_kontrol=0; // 0 ise üye kayıtlı değil,1 ise kayıtlı
 	FILE *fp;
 	OGR_UYE *uye=(OGR_UYE*)malloc(sizeof(OGR_UYE));
 	int i;
@@ -1067,7 +1072,8 @@ void ogrenci_ekle(){
 			return;
 		}
 	}
-	
+	fclose(fp);
+	fp=fopen("Ogrenciler.txt","a+");
 	fprintf(fp,"%s %s %s %d %d\n",input[0].ad,input[0].soyad,input[0].no,0,0);
 	free(ogr);
 	free(input);
@@ -1078,7 +1084,7 @@ void ogrenci_sil(){
 	FILE *fp;
 	OGRENCI *ogr=(OGRENCI*)malloc(sizeof(OGRENCI));
 	char *no=(char*)malloc(11*sizeof(char));
-	int ogr_kontrol=0; // 0 ise Ã¶Ã°renci kayÃ½tlarda bulunmuyor, 1 ise bulunuyor.
+	int ogr_kontrol=0; // 0 ise öğrenci kayıtlarda bulunmuyor, 1 ise bulunuyor.
 	fp=fopen("Ogrenciler.txt","a+");
 	int i;
 	int satir=-1;
@@ -1721,7 +1727,7 @@ void ders_ogr_yaz(){
 		OGRENCI *ogr=(OGRENCI*)malloc(sizeof(OGRENCI));
 		int satir2=-1;
 		fp=fopen("OgrenciDersKayit.txt","a+");
-		printf("---------------DERSI ALAN OGRENCÃLER---------------\n");
+		printf("---------------DERSI ALAN OGRENCİLER---------------\n");
 		
 		satir=-1;
 		while(!feof(fp)){
